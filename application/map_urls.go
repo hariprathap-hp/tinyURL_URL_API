@@ -4,7 +4,7 @@ import "test3/hariprathap-hp/DesignTinyURL/tinyURL_URL_API/controller/urlcontrol
 
 func mapURLs() {
 	router.POST("/create", urlcontroller.CreateURL)
-	router.GET("/delete", urlcontroller.DeleteURL)
+	router.POST("/delete", urlcontroller.DeleteURL)
 	router.GET("/redirect", urlcontroller.RedirectURL)
 	router.GET("/list", urlcontroller.ListURLs)
 }

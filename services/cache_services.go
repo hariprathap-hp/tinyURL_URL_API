@@ -11,6 +11,7 @@ type cacheServices struct{}
 type cacheServicesInterface interface {
 	Get() string
 	Set([]string)
+	SetKey(key string)
 }
 
 func (cs *cacheServices) Get() string {

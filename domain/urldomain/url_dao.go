@@ -33,6 +33,14 @@ func (url *Url) Create() *errors.RestErr {
 
 func (url *Url) Delete() *errors.RestErr {
 	//the function delete is to delete a tinyURL from the DB
+	query, err := postgres.Client.Prepare(deleteURLQuery)
+	if err != nil {
+		return errors.NewInternalServerError("DB Error: statement preparation failed")
+	}
+	defer query.Close()
+	if _, deleteErr := query.Exec(url.TinyURL); deleteErr != nil {
+		return errors.NewInternalServerError(fmt.Sprintf("Error while trying to delete the tiny url %s", url.TinyURL))
+	}
 	return nil
 }
 

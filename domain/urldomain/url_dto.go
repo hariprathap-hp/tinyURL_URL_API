@@ -19,6 +19,10 @@ type ListURLs struct {
 	TinyURL     string `json:"tiny_url"`
 }
 
+type UniqKeys struct {
+	Keys []string `json:"keys"`
+}
+
 type UrlsList []ListURLs
 
 func (url *Url) Validate() *errors.RestErr {

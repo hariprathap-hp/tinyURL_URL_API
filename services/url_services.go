@@ -2,7 +2,7 @@ package services
 
 import (
 	"encoding/json"
-	"fmt"
+	"strings"
 	"test3/hariprathap-hp/DesignTinyURL/tinyURL_URL_API/domain/urldomain"
 	"test3/hariprathap-hp/system_design/utils_repo/dateutils"
 	"test3/hariprathap-hp/system_design/utils_repo/errors"
@@ -11,10 +11,10 @@ import (
 )
 
 var (
-	UrlService     urlServicesInterface = &urlService{}
-	kgsRestAPICall                      = rest.RequestBuilder{
-		Timeout: 100 * time.Second,
+	UrlService       urlServicesInterface = &urlService{}
+	kgsRestClientURL                      = rest.RequestBuilder{
 		BaseURL: "http://localhost:8080",
+		Timeout: 100 * time.Second,
 	}
 )
 
@@ -22,28 +22,40 @@ type urlService struct {
 }
 
 type urlServicesInterface interface {
-	CreateURL(urldomain.Url) *errors.RestErr
-	DeleteURL()
+	CreateURL(urldomain.Url) (*urldomain.ListURLs, *errors.RestErr)
+	DeleteURL(urldomain.Url) *errors.RestErr
 	RedirectURL()
 	ListURLs()
 }
 
-func (url *urlService) CreateURL(url_obj urldomain.Url) *errors.RestErr {
+func (url *urlService) CreateURL(url_obj urldomain.Url) (*urldomain.ListURLs, *errors.RestErr) {
 	if valErr := url_obj.Validate(); valErr != nil {
-		return valErr
+		return nil, valErr
 	}
-	if loadErr := loadUrl(&url_obj); loadErr != nil {
-		return loadErr
+	key, loadErr := loadUrl(&url_obj)
+	if loadErr != nil {
+		return nil, loadErr
 	}
 	createErr := url_obj.Create()
 	if createErr != nil {
-		return createErr
+		if strings.Contains(createErr.Message, "already present in the database") {
+			CacheService.SetKey(*key)
+		}
+		return nil, createErr
 	}
-	return nil
+	result := urldomain.ListURLs{
+		OriginalURL: url_obj.OriginalURL,
+		TinyURL:     url_obj.TinyURL,
+	}
+	return &result, nil
 }
 
-func (url *urlService) DeleteURL() {
-
+func (url *urlService) DeleteURL(url_obj urldomain.Url) *errors.RestErr {
+	delErr := url_obj.Delete()
+	if delErr != nil {
+		return delErr
+	}
+	return nil
 }
 
 func (url *urlService) RedirectURL() {
@@ -54,16 +66,15 @@ func (url *urlService) ListURLs() {
 
 }
 
-func loadUrl(url *urldomain.Url) *errors.RestErr {
+func loadUrl(url *urldomain.Url) (*string, *errors.RestErr) {
 	url.CreationDate = dateutils.GetNow()
 	url.ExpirationDate = dateutils.GetExpiry()
 	key, keyErr := getID()
 	if keyErr != nil {
-		return keyErr
+		return nil, keyErr
 	}
 	url.TinyURL = "http://localhost:8081/" + *key
-
-	return nil
+	return key, nil
 }
 
 func getID() (*string, *errors.RestErr) {
@@ -71,18 +82,15 @@ func getID() (*string, *errors.RestErr) {
 		if key := CacheService.Get(); key != "" {
 			return &key, nil
 		}
-
-		response := kgsRestAPICall.Get("/getKeys")
+		//we need to make an internal API call to KGS
+		response := kgsRestClientURL.Get("/getKeys")
 		if response == nil || response.Response == nil {
-			return nil, errors.NewInternalServerError("invalid rest client response from Key Generation Service")
+			return nil, errors.NewInternalServerError("invalid rest client response while trying to contact KGS")
 		}
-
-		var uniq_keys struct {
-			Keys []string `json:"keys"`
+		var keys urldomain.UniqKeys
+		if err := json.Unmarshal(response.Bytes(), &keys); err != nil {
+			return nil, errors.NewInternalServerError("error while decoding the json value received from KGS")
 		}
-		json.Unmarshal(response.Bytes(), &uniq_keys)
-		fmt.Println("results are - ", uniq_keys.Keys)
-		CacheService.Set(uniq_keys.Keys) //load keys into the cache
+		CacheService.Set(keys.Keys)
 	}
-
 }
