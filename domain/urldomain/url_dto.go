@@ -1,6 +1,10 @@
 package urldomain
 
-import "time"
+import (
+	"strings"
+	"test3/hariprathap-hp/system_design/utils_repo/errors"
+	"time"
+)
 
 type Url struct {
 	OriginalURL    string    `json:"orig_url"`
@@ -16,3 +20,15 @@ type ListURLs struct {
 }
 
 type UrlsList []ListURLs
+
+func (url *Url) Validate() *errors.RestErr {
+	url.OriginalURL = strings.TrimSpace(strings.ToLower(url.OriginalURL))
+	if url.OriginalURL == "" {
+		return errors.NewBadRequestError("invalid original url input. should not be empty")
+	}
+	url.UserEmail = strings.TrimSpace(strings.ToLower(url.UserEmail))
+	if url.OriginalURL == "" {
+		return errors.NewBadRequestError("invalid email input. should not be empty")
+	}
+	return nil
+}
