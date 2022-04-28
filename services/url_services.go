@@ -24,8 +24,8 @@ type urlService struct {
 type urlServicesInterface interface {
 	CreateURL(urldomain.Url) (*urldomain.ListURLs, *errors.RestErr)
 	DeleteURL(urldomain.Url) *errors.RestErr
-	RedirectURL()
-	ListURLs()
+	RedirectURL(urldomain.Url) (*string, *errors.RestErr)
+	ListURLs(urldomain.Url) (urldomain.UrlsList, *errors.RestErr)
 }
 
 func (url *urlService) CreateURL(url_obj urldomain.Url) (*urldomain.ListURLs, *errors.RestErr) {
@@ -58,12 +58,20 @@ func (url *urlService) DeleteURL(url_obj urldomain.Url) *errors.RestErr {
 	return nil
 }
 
-func (url *urlService) RedirectURL() {
-
+func (url *urlService) RedirectURL(url_obj urldomain.Url) (*string, *errors.RestErr) {
+	result, redirErr := url_obj.Redirect()
+	if redirErr != nil {
+		return nil, redirErr
+	}
+	return result, nil
 }
 
-func (url *urlService) ListURLs() {
-
+func (url *urlService) ListURLs(url_obj urldomain.Url) (urldomain.UrlsList, *errors.RestErr) {
+	result, listErr := url_obj.List()
+	if listErr != nil {
+		return nil, listErr
+	}
+	return result, nil
 }
 
 func loadUrl(url *urldomain.Url) (*string, *errors.RestErr) {

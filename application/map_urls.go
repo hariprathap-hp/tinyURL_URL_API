@@ -6,5 +6,5 @@ func mapURLs() {
 	router.POST("/create", urlcontroller.CreateURL)
 	router.POST("/delete", urlcontroller.DeleteURL)
 	router.GET("/redirect", urlcontroller.RedirectURL)
-	router.GET("/list", urlcontroller.ListURLs)
+	router.POST("/list", urlcontroller.ListURLs)
 }

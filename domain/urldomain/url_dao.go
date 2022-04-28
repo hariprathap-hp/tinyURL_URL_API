@@ -46,10 +46,37 @@ func (url *Url) Delete() *errors.RestErr {
 
 func (url *Url) Redirect() (*string, *errors.RestErr) {
 	//the function redirect is to fetch the original url for a tinyurl so that it can be redirected by our controller layer
-	return nil, nil
+	query, err := postgres.Client.Prepare(redirectURLQuery)
+	if err != nil {
+		return nil, errors.NewInternalServerError("DB Error: statement preparation failed")
+	}
+	defer query.Close()
+	var orig_url string
+	scanErr := query.QueryRow(url.TinyURL).Scan(&orig_url)
+	if scanErr != nil {
+		return nil, errors.NewInternalServerError("DB Error: error while trying to query database")
+	}
+	return &orig_url, nil
 }
 
 func (url *Url) List() (UrlsList, *errors.RestErr) {
 	//the function list gets all the tinyURLs created for any particular user
-	return nil, nil
+	query, err := postgres.Client.Prepare(listURLQuery)
+	if err != nil {
+		return nil, errors.NewInternalServerError("DB Error: statement preparation failed")
+	}
+	defer query.Close()
+	rows, listErr := query.Query(url.UserEmail)
+	if listErr != nil {
+		return nil, errors.NewInternalServerError("DB Error: error while trying to query database")
+	}
+	result := make([]ListURLs, 0)
+	for rows.Next() {
+		var res ListURLs
+		if scanErr := rows.Scan(&res.OriginalURL, &res.TinyURL); scanErr != nil {
+			return nil, errors.NewInternalServerError("DB Error: error while scanning the query result")
+		}
+		result = append(result, res)
+	}
+	return result, nil
 }

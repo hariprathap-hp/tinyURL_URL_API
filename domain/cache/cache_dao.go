@@ -1,6 +1,8 @@
 package cache
 
-import "test3/hariprathap-hp/DesignTinyURL/tinyURL_URL_API/dataResources/redis"
+import (
+	"test3/hariprathap-hp/DesignTinyURL/tinyURL_URL_API/dataResources/redis"
+)
 
 func (rc *RedisCache) Set(keys []string) {
 	//we are implement LPUSH. Create a new list "url_keys" and push the keys received from KGS

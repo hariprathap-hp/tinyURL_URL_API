@@ -42,9 +42,28 @@ func DeleteURL(c *gin.Context) {
 }
 
 func ListURLs(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, "Implement List")
+	var url urldomain.Url
+	bindErr := c.ShouldBindJSON(&url)
+	if bindErr != nil {
+		c.JSON(http.StatusInternalServerError, errors.NewError("bind err : json binding failed at controller"))
+		return
+	}
+
+	result, err := services.UrlService.ListURLs(url)
+	if err != nil {
+		c.JSON(err.Status, err.Message)
+		return
+	}
+	c.JSON(http.StatusOK, result)
 }
 
 func RedirectURL(c *gin.Context) {
-	c.JSON(http.StatusNotImplemented, "Implement Redirect")
+	var url urldomain.Url
+	url.TinyURL = c.Request.URL.Query().Get("tiny_url")
+	result, err := services.UrlService.RedirectURL(url)
+	if err != nil {
+		c.JSON(err.Status, err.Message)
+		return
+	}
+	c.Redirect(http.StatusTemporaryRedirect, *result)
 }
