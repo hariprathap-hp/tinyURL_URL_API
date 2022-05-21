@@ -15,7 +15,7 @@ var (
 
 const (
 	drivername = "DRIVER"
-	dbUser     = "USER"
+	dbUser     = "DBUSER"
 	dbPassword = "PASSWORD"
 	dbPort     = "PORT"
 	dbName     = "DBNAME"

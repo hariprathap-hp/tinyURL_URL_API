@@ -20,6 +20,7 @@ func (url *Url) Create() *errors.RestErr {
 	//the function create is to insert the tinyURL along with other values into the DB
 	query, err := postgres.Client.Prepare(insertURLQuery)
 	if err != nil {
+		fmt.Println(err)
 		return errors.NewInternalServerError("DB Error: statement preparation failed")
 	}
 	defer query.Close()
