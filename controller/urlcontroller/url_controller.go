@@ -3,11 +3,11 @@ package urlcontroller
 import (
 	"fmt"
 	"net/http"
-	"test3/hariprathap-hp/DesignTinyURL/tinyURL_URL_API/domain/urldomain"
-	"test3/hariprathap-hp/DesignTinyURL/tinyURL_URL_API/services"
-	"test3/hariprathap-hp/system_design/utils_repo/errors"
 
 	"github.com/gin-gonic/gin"
+	"github.com/hariprathap-hp/tinyURL_URL_API/domain/urldomain"
+	"github.com/hariprathap-hp/tinyURL_URL_API/services"
+	"github.com/hariprathap-hp/utils_repo/errors"
 )
 
 func CreateURL(c *gin.Context) {

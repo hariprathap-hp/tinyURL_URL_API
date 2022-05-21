@@ -1,6 +1,6 @@
 package main
 
-import "test3/hariprathap-hp/DesignTinyURL/tinyURL_URL_API/application"
+import "github.com/hariprathap-hp/tinyURL_URL_API/application"
 
 func main() {
 	application.StartApp()

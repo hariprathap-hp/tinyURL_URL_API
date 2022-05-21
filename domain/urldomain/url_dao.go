@@ -3,8 +3,9 @@ package urldomain
 import (
 	"fmt"
 	"strings"
-	"test3/hariprathap-hp/DesignTinyURL/tinyURL_URL_API/dataResources/postgres"
-	"test3/hariprathap-hp/system_design/utils_repo/errors"
+
+	"github.com/hariprathap-hp/tinyURL_URL_API/dataResources/postgres"
+	"github.com/hariprathap-hp/utils_repo/errors"
 )
 
 const (

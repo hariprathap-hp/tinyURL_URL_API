@@ -1,6 +1,6 @@
 package application
 
-import "test3/hariprathap-hp/DesignTinyURL/tinyURL_URL_API/controller/urlcontroller"
+import "github.com/hariprathap-hp/tinyURL_URL_API/controller/urlcontroller"
 
 func mapURLs() {
 	router.POST("/create", urlcontroller.CreateURL)

@@ -3,11 +3,14 @@ package services
 import (
 	"encoding/json"
 	"strings"
-	"test3/hariprathap-hp/DesignTinyURL/tinyURL_URL_API/domain/urldomain"
-	"test3/hariprathap-hp/system_design/utils_repo/dateutils"
-	"test3/hariprathap-hp/system_design/utils_repo/errors"
-	"test3/hariprathap-hp/test/golang-restclient/rest"
+
 	"time"
+
+	"github.com/golang-restclient/rest"
+	"github.com/hariprathap-hp/tinyURL_URL_API/domain/urldomain"
+
+	"github.com/hariprathap-hp/utils_repo/dateutils"
+	"github.com/hariprathap-hp/utils_repo/errors"
 )
 
 var (

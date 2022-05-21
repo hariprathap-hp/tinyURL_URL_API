@@ -1,10 +1,11 @@
 package application
 
 import (
-	"test3/hariprathap-hp/DesignTinyURL/tinyURL_URL_API/dataResources/postgres"
-	"test3/hariprathap-hp/DesignTinyURL/tinyURL_URL_API/dataResources/redis"
+	"context"
 
 	"github.com/gin-gonic/gin"
+	"github.com/hariprathap-hp/tinyURL_URL_API/dataResources/postgres"
+	"github.com/hariprathap-hp/tinyURL_URL_API/dataResources/redis"
 )
 
 var (
@@ -14,6 +15,6 @@ var (
 func StartApp() {
 	mapURLs()
 	postgres.Connect()
-	redis.Client.Set("key1", "value1", 0)
+	redis.Client.Set(context.Background(), "key1", "value1", 0)
 	router.Run(":8081")
 }

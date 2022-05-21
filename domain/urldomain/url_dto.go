@@ -2,8 +2,10 @@ package urldomain
 
 import (
 	"strings"
-	"test3/hariprathap-hp/system_design/utils_repo/errors"
+
 	"time"
+
+	"github.com/hariprathap-hp/utils_repo/errors"
 )
 
 type Url struct {

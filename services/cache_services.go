@@ -1,6 +1,6 @@
 package services
 
-import "test3/hariprathap-hp/DesignTinyURL/tinyURL_URL_API/domain/cache"
+import "github.com/hariprathap-hp/tinyURL_URL_API/domain/cache"
 
 var (
 	CacheService cacheServicesInterface = &cacheServices{}
