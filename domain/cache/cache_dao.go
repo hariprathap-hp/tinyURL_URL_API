@@ -20,3 +20,13 @@ func (rc *RedisCache) Get() string {
 	key := redis.Client.LPop(context.Background(), "urlkeys")
 	return key.Val()
 }
+
+func (rc *RedisCache) HSet(key, value string) int64 {
+	res := redis.Client.HSet(context.Background(), "tiny_url", key, value)
+	return res.Val()
+}
+
+func (rc *RedisCache) HGet(key string) string {
+	res := redis.Client.HGet(context.Background(), "tiny_url", key)
+	return res.Val()
+}

@@ -39,6 +39,7 @@ func (url *urlService) CreateURL(url_obj urldomain.Url) (*urldomain.ListURLs, *e
 	if loadErr != nil {
 		return nil, loadErr
 	}
+
 	createErr := url_obj.Create()
 	if createErr != nil {
 		if strings.Contains(createErr.Message, "already present in the database") {
@@ -49,6 +50,10 @@ func (url *urlService) CreateURL(url_obj urldomain.Url) (*urldomain.ListURLs, *e
 	result := urldomain.ListURLs{
 		OriginalURL: url_obj.OriginalURL,
 		TinyURL:     url_obj.TinyURL,
+	}
+	isCached := CacheService.HSet(url_obj.TinyURL, url_obj.OriginalURL)
+	if isCached != nil {
+		return nil, isCached
 	}
 	return &result, nil
 }
@@ -62,11 +67,15 @@ func (url *urlService) DeleteURL(url_obj urldomain.Url) *errors.RestErr {
 }
 
 func (url *urlService) RedirectURL(url_obj urldomain.Url) (*string, *errors.RestErr) {
-	result, redirErr := url_obj.Redirect()
-	if redirErr != nil {
-		return nil, redirErr
+	isCached, err := CacheService.HGet(url_obj.TinyURL)
+	if err != nil {
+		result, redirErr := url_obj.Redirect()
+		if redirErr != nil {
+			return nil, redirErr
+		}
+		return result, nil
 	}
-	return result, nil
+	return isCached, nil
 }
 
 func (url *urlService) ListURLs(url_obj urldomain.Url) (urldomain.UrlsList, *errors.RestErr) {
