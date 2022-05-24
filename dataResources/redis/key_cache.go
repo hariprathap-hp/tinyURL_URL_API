@@ -1,6 +1,8 @@
 package redis
 
-import "github.com/go-redis/redis"
+import (
+	"github.com/go-redis/redis"
+)
 
 var (
 	Client *redis.Client
@@ -12,5 +14,4 @@ func init() {
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
-
 }

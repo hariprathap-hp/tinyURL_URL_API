@@ -2,11 +2,13 @@ package services
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 
 	"time"
 
 	"github.com/golang-restclient/rest"
+	"github.com/hariprathap-hp/tinyURL_URL_API/dataResources/lru"
 	"github.com/hariprathap-hp/tinyURL_URL_API/domain/urldomain"
 
 	"github.com/hariprathap-hp/utils_repo/dateutils"
@@ -51,10 +53,7 @@ func (url *urlService) CreateURL(url_obj urldomain.Url) (*urldomain.ListURLs, *e
 		OriginalURL: url_obj.OriginalURL,
 		TinyURL:     url_obj.TinyURL,
 	}
-	isCached := CacheService.HSet(url_obj.TinyURL, url_obj.OriginalURL)
-	if isCached != nil {
-		return nil, isCached
-	}
+	lru.Cache.Add(url_obj.TinyURL, url_obj.OriginalURL)
 	return &result, nil
 }
 
@@ -63,19 +62,24 @@ func (url *urlService) DeleteURL(url_obj urldomain.Url) *errors.RestErr {
 	if delErr != nil {
 		return delErr
 	}
+	lru.Cache.Remove(url_obj.TinyURL)
 	return nil
 }
 
 func (url *urlService) RedirectURL(url_obj urldomain.Url) (*string, *errors.RestErr) {
-	isCached, err := CacheService.HGet(url_obj.TinyURL)
-	if err != nil {
+	val, ok := lru.Cache.Get(url_obj.TinyURL)
+	if !ok {
 		result, redirErr := url_obj.Redirect()
 		if redirErr != nil {
 			return nil, redirErr
 		}
+		lru.Cache.Add(url_obj.TinyURL, *result)
 		return result, nil
 	}
-	return isCached, nil
+	fmt.Println("Found in Cache")
+	res := fmt.Sprintf("%v", val)
+	return &res, nil
+
 }
 
 func (url *urlService) ListURLs(url_obj urldomain.Url) (urldomain.UrlsList, *errors.RestErr) {
